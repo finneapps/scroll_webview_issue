@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final boolean ADD_STYLES_AFTER_PAGE_LOADED = true;
+    private static final boolean BREAK_SCROLLING = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,8 +18,11 @@ public class MainActivity extends AppCompatActivity {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         webView.setWebViewClient(new MyWebViewClient());
-        webView.loadData(ADD_STYLES_AFTER_PAGE_LOADED ? getHtmlWithNoStylesInHeader() : getHtmlWithHeader(),
-                "text/html", "UTF-8");
+        webView.loadData(getHtmlWithNoStylesInHeader(), "text/html", "UTF-8");
+    }
+
+    private String sinnerStyle() {
+        return " document.documentElement.style.overflow = \"hidden\";";
     }
 
     private String getHtmlWithNoStylesInHeader() {
@@ -27,15 +30,10 @@ public class MainActivity extends AppCompatActivity {
                "></html>";
     }
 
-    private String getHtmlWithHeader() {
-        return "<html><head>    <style>html\n" + "    {\n" +
-               "        margin:0px !important; height:639px!important; padding-top:56px!important;-webkit-column-gap: 0px!important; -webkit-column-width: 412px!important;\n" +
-               "    }</style></head><body><p>" + HtmlContent.LOREM + "</p></body></html>";
-    }
-
     private String getJavaScript() {
         return "\n<script type=\"text/javascript\">function setStyles(){document.body.style" +
-               ".webkitColumnWidth = \"412px\";document.body.style.height = \"600px\";}</script>\n";
+               ".webkitColumnWidth = \"412px\";document.body.style.height = \"600px\";\n" +
+               (BREAK_SCROLLING ? sinnerStyle() : "") + "}</script>\n";
     }
 
     private class MyWebViewClient extends WebViewClient {
@@ -43,14 +41,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(final WebView view, String url) {
             super.onPageFinished(view, url);
-            if (ADD_STYLES_AFTER_PAGE_LOADED) {
-                view.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        view.loadUrl("javascript:setStyles();");
-                    }
-                });
-            }
+            view.post(new Runnable() {
+                @Override
+                public void run() {
+                    view.loadUrl("javascript:setStyles();");
+                }
+            });
         }
     }
 
