@@ -5,3 +5,4 @@ When adding document.documentElement.style.overflow = "hidden" the scrolling bre
 The sample app has a BREAK_SCROLLING boolean that can be toggled to see the difference of having 
 document.documentElement.style.overflow = "hidden" 
 added or not.
+Note that the scrolling does not break on the android emulator (properly don't have the Chrome update), therefore a real device needs to be used for testing
